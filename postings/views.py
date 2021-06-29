@@ -1,10 +1,11 @@
-import math
+import math, json
 
 from django.views     import View
 from django.db.models import Q
 from django.http      import JsonResponse
 
-from postings.models import Posting
+from .models      import Posting, Like
+from users.utils import authorize_user
 
 class PictureListView(View):
     def get(self, request):
@@ -62,3 +63,50 @@ class PictureListView(View):
             }
             for posting in postings]
         return JsonResponse({'result':postings_list}, status = 200)
+
+class PostingView(View):
+    def get(self, request, posting_id):
+        try:
+            posting = Posting.objects.get(id=posting_id) 
+            result = {
+                'id'           : posting.id,
+                'image'        : posting.image,
+                'text'         : posting.text,
+                'size'         : posting.size.type,
+                'style'        : posting.style.type,
+                'like'         : posting.like_posting.count(),
+                'housing_type' : posting.housing_type.type,
+                'view'         : posting.view,
+                'related_user' : [{  
+                    'id'           : posting.user.id,
+                    'nickname'     : posting.user.nickname,
+                    'image_url'    : posting.user.profile_image,
+                    'introduction' : posting.user.introduction   
+                }]
+            }
+            
+            return JsonResponse({'posting' : result}, status=200)
+        except Posting.DoesNotExist:
+            return JsonResponse({'message': 'object does not exist'}, status=404)
+      
+class LikeView(View):    
+    @authorize_user
+    def post(self, request, posting_id):
+        user = request.user
+        
+        Like.objects.create(
+                user_id    = user.id,
+                posting_id = posting_id
+            )
+        
+        return JsonResponse({'message':'CREATE_LIKE'}, status=201)
+         
+    @authorize_user
+    def delete(self, request, posting_id):
+        user = request.user
+        
+        Like.objects.delete(
+            user_id    = user.id,
+            posting_id = posting_id
+        )
+        return JsonResponse({'message': 'DELETE_LIKE'}, status=204)
