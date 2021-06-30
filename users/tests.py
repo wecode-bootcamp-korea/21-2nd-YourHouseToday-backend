@@ -485,7 +485,7 @@ class AccountTest(TestCase):
     def test_mypage_success(self):
         user     = User.objects.get(kakao_id="1111111111")
         token    = jwt.encode({'id': user.id}, SECRET_KEY, ALGORITHM)
-        response = Client().get('/users/mypage', HTTP_AUTHORIZATION=token)
+        response = Client().get('/users', HTTP_AUTHORIZATION=token)
 
         self.assertEqual(
             response.json(),
