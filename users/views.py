@@ -6,10 +6,9 @@ from json.decoder import JSONDecodeError
 from django.views import View
 from django.http  import JsonResponse
 
-from .models         import User
-from postings.models import Posting,Like
-from .utils          import sort_user,authorize_user
-from my_settings     import SECRET_KEY,ALGORITHM
+from .models     import User
+from .utils      import Mail, authorize_user
+from my_settings import SECRET_KEY,ALGORITHM
 
 class SingInView(View):
     def post(self,request):
@@ -88,6 +87,14 @@ class SignUpView(View):
                 'profile_image' : user.profile_image,
                 'self_token'    : self_token    
             }
+
+            signup_mail = Mail()
+            signup_mail.create(
+                receiver=data['email'],
+                subject="Your House Today에 가입해주셔서 감사합니다!",
+                template='mail_signup.html'
+            )
+            signup_mail.send()
 
             return JsonResponse(result, status=201)
 
