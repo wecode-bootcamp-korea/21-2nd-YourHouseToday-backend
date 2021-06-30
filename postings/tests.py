@@ -1,11 +1,15 @@
-from django import views
-from django.test import TestCase, Client
+import json, jwt
+
+from unittest.mock      import patch, MagicMock
+from django.test        import TestCase, Client
+from django.core.files  import File
 
 from postings.models import Posting, HousingType, Style, Size, Color, Like
 from users.models    import User
 from comments.models import Comment
+from my_settings import SECRET_KEY, ALGORITHM
 
-class PictureListTest(TestCase):
+class PostingsViewTest(TestCase):
     def setUp(self):
         posting_user = User.objects.create(
             id            = 1,
@@ -59,7 +63,7 @@ class PictureListTest(TestCase):
             update_at    = '2021-10-20',
             view         = 20
             )
-        posting_3 = Posting.objects.create(
+        Posting.objects.create(
             id           = 3,
             user         = posting_user,
             housing_type = housing_type_apart,
@@ -72,7 +76,7 @@ class PictureListTest(TestCase):
             update_at    = '2021-10-25',
             view         = 11
             )
-        posting_4 = Posting.objects.create(
+        Posting.objects.create(
             id           = 4,
             user         = posting_user,
             housing_type = housing_type_one_room,
@@ -99,7 +103,7 @@ class PictureListTest(TestCase):
         Posting.objects.all().delete()
         Like.objects.all().delete()
 
-    def test_picture_list_get_success(self):
+    def test_postings_list_get_success(self):
         client   = Client()
         response = client.get('/postings')
         self.assertEqual(response.status_code, 200)
@@ -166,7 +170,7 @@ class PictureListTest(TestCase):
             ]
         })
         
-    def test_picture_list_filter_success(self):
+    def test_postings_list_filter_success(self):
         client   = Client()
         response = client.get('/postings?style=2')
         self.assertEqual(response.status_code, 200)
@@ -204,7 +208,7 @@ class PictureListTest(TestCase):
             ]
         })
         
-    def test_picture_list_order_by_success(self):
+    def test_postings_list_order_by_success(self):
         client   = Client()
         response = client.get('/postings?sort=-view')
         self.assertEqual(response.status_code, 200)
@@ -270,7 +274,7 @@ class PictureListTest(TestCase):
             ]
         })
         
-    def test_picture_list_page_get(self):
+    def test_postings_list_page_get(self):
         client   = Client()
         response = client.get('/postings?limit=2&offset=1')
         self.assertEqual(response.status_code, 200)
@@ -307,6 +311,28 @@ class PictureListTest(TestCase):
                 }
             ]
         })
+    @patch('postings.views.boto3.client')
+    def test_writing_success(self, mock_s3client):
+        client        = Client()
+        mock_img      = MagicMock(sepc=File)
+        mock_img.name = 'img.jpg'
+        mock_s3client.upload_fileobj = MagicMock()
+        access_token                 = jwt.encode({'id': 1}, SECRET_KEY, ALGORITHM)
+        headers                      = {'HTTP_Authorization': access_token}
+        print(access_token)
+        form_data = {
+            'image': mock_img,
+            'info' : json.dumps({
+                'housing_type' : 'one_room',
+                'size'         : '10',
+                'style'        : 'modern',
+                'back_color'   : 'black',
+                'item_color'   : 'red',
+                'text'         : 'test'
+                })}
+        response = client.post('/postings', form_data, **headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {"messege":"SUCCESS"})
 
 class PostingTestCase(TestCase): 
     def setUp(self):

@@ -1,13 +1,14 @@
-import math, json
+import math, json, datetime, boto3, uuid
 
 from django.views     import View
 from django.db.models import Q
 from django.http      import JsonResponse
 
-from .models      import Posting, Like
-from users.utils import authorize_user
+from .models      import Posting, Like, HousingType, Size, Style, Color
+from users.utils  import authorize_user
+from my_settings  import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_CUSTOM_DOMAIN, AWS_STORAGE_BUCKET_NAME
 
-class PictureListView(View):
+class PostingsView(View):
     def get(self, request):
         housing_type  = request.GET.get('housing-type', None)
         back_color    = request.GET.get('back-color', None)
@@ -63,6 +64,48 @@ class PictureListView(View):
             }
             for posting in postings]
         return JsonResponse({'result':postings_list}, status = 200)
+
+    @authorize_user
+    def post(self, request):
+        try:
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+            )
+            image = request.FILES['image']
+            my_uuid = str(uuid.uuid4())
+            s3_client.upload_fileobj(
+                image, 
+                AWS_STORAGE_BUCKET_NAME,
+                my_uuid,
+                ExtraArgs={
+                    "ContentType": image.content_type
+                })
+            image_url    = AWS_S3_CUSTOM_DOMAIN + my_uuid
+            data         = json.loads(request.POST['info'])
+            housing_type = HousingType.objects.get(type=data['housing_type'])
+            size         = Size.objects.get(type=data['size'])
+            style        = Style.objects.get(type=data['style'])
+            back_color   = Color.objects.get(type=data['back_color'])
+            item_color   = Color.objects.get(type=data['item_color'])
+            text         = data['text']
+
+            Posting.objects.create(
+                user         = request.user,
+                housing_type = housing_type,
+                size         = size,
+                style        = style,
+                back_color   = back_color,
+                item_color   = item_color,
+                image        = image_url,
+                text         = text,
+                update_at    = datetime.datetime.now()
+                )
+            return JsonResponse({"messege":"SUCCESS"}, status = 201)
+
+        except KeyError:
+            return JsonResponse({"messege":"KEY_ERROR"}, status = 400)
 
 class PostingView(View):
     def get(self, request, posting_id):
