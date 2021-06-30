@@ -57,9 +57,9 @@ class PictureListView(View):
                 'viewCount'      : posting.view,
                 'heartCount'     : posting.like_posting.count(),
                 'commentCount'   : posting.comment_set.order_by('create_at').count(),
-                'writerImage'    : posting.comment_set.order_by('create_at')[0].user.profile_image,
-                'writerName'     : posting.comment_set.order_by('create_at')[0].user.nickname,
-                'commentContent' : posting.comment_set.order_by('create_at')[0].text
+                'writerImage'    : [posting.comment_set.order_by('create_at')[0].user.profile_image] if posting.comment_set.count() != 0 else '',
+                'writerName'     : [posting.comment_set.order_by('create_at')[0].user.nickname] if posting.comment_set.count() != 0 else '',
+                'commentContent' : [posting.comment_set.order_by('create_at')[0].text] if posting.comment_set.count() != 0 else ''
             }
             for posting in postings]
         return JsonResponse({'result':postings_list}, status = 200)
@@ -110,3 +110,4 @@ class LikeView(View):
             posting_id = posting_id
         )
         return JsonResponse({'message': 'DELETE_LIKE'}, status=204)
+
