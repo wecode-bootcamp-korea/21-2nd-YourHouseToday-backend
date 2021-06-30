@@ -87,8 +87,6 @@ class PictureListTest(TestCase):
             )
         Comment.objects.create(id=1, posting=posting_1, user=comment_user, text='너무 이쁘네요')
         Comment.objects.create(id=2, posting=posting_2, user=comment_user, text='너무 보기 좋아요')
-        Comment.objects.create(id=3, posting=posting_3, user=comment_user, text='너무 좋아요')
-        Comment.objects.create(id=4, posting=posting_4, user=comment_user, text='방이 부럽네요')
         Like.objects.create(id=1, user=comment_user, posting=posting_1)
         Like.objects.create(id=2, user=comment_user, posting=posting_2)
     
@@ -118,9 +116,9 @@ class PictureListTest(TestCase):
                     'viewCount': 10, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 이쁘네요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 이쁘네요']
                 },
                 {
                     'id': 2, 
@@ -132,9 +130,9 @@ class PictureListTest(TestCase):
                     'viewCount': 20, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 보기 좋아요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 보기 좋아요']
                 },
                 {
                     'id': 3, 
@@ -145,10 +143,10 @@ class PictureListTest(TestCase):
                     'cardImage': 'posting_image_url', 
                     'viewCount': 11, 
                     'heartCount': 0, 
-                    'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 좋아요'
+                    'commentCount': 0, 
+                    'writerImage': '', 
+                    'writerName': '', 
+                    'commentContent': ''
                 },
                 {
                     'id': 4, 
@@ -159,10 +157,10 @@ class PictureListTest(TestCase):
                     'cardImage': 'posting_image_url', 
                     'viewCount': 24, 
                     'heartCount': 0, 
-                    'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '방이 부럽네요'
+                    'commentCount': 0, 
+                    'writerImage': '', 
+                    'writerName': '', 
+                    'commentContent': ''
                 }
 
             ]
@@ -184,9 +182,9 @@ class PictureListTest(TestCase):
                     'viewCount': 20, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 보기 좋아요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 보기 좋아요']
                 },
                 {
                     'id': 3, 
@@ -197,10 +195,10 @@ class PictureListTest(TestCase):
                     'cardImage': 'posting_image_url', 
                     'viewCount': 11, 
                     'heartCount': 0, 
-                    'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 좋아요'
+                    'commentCount': 0, 
+                    'writerImage': '', 
+                    'writerName': '', 
+                    'commentContent': ''
                 }
             ]
         })
@@ -220,10 +218,10 @@ class PictureListTest(TestCase):
                     'cardImage': 'posting_image_url', 
                     'viewCount': 24, 
                     'heartCount': 0, 
-                    'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '방이 부럽네요'
+                    'commentCount': 0, 
+                    'writerImage': '', 
+                    'writerName': '', 
+                    'commentContent': ''
                 },
                 {
                     'id': 2, 
@@ -235,9 +233,9 @@ class PictureListTest(TestCase):
                     'viewCount': 20, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 보기 좋아요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 보기 좋아요']
                 },
                 {
                     'id': 3, 
@@ -248,10 +246,10 @@ class PictureListTest(TestCase):
                     'cardImage': 'posting_image_url', 
                     'viewCount': 11, 
                     'heartCount': 0, 
-                    'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 좋아요'
+                    'commentCount': 0, 
+                    'writerImage': '', 
+                    'writerName': '', 
+                    'commentContent': ''
                 },
                 {
                     'id': 1, 
@@ -263,9 +261,9 @@ class PictureListTest(TestCase):
                     'viewCount': 10, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 이쁘네요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 이쁘네요']
                 }
             ]
         })
@@ -286,9 +284,9 @@ class PictureListTest(TestCase):
                     'viewCount': 10, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 이쁘네요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 이쁘네요']
                 },
                 {
                     'id': 2, 
@@ -300,9 +298,9 @@ class PictureListTest(TestCase):
                     'viewCount': 20, 
                     'heartCount': 1, 
                     'commentCount': 1, 
-                    'writerImage': 'profile_image_url', 
-                    'writerName': '아이언맨', 
-                    'commentContent': '너무 보기 좋아요'
+                    'writerImage': ['profile_image_url'], 
+                    'writerName': ['아이언맨'], 
+                    'commentContent': ['너무 보기 좋아요']
                 }
             ]
         })
