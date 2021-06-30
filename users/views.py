@@ -6,9 +6,10 @@ from json.decoder import JSONDecodeError
 from django.views import View
 from django.http  import JsonResponse
 
-from .models      import User
-from users.utils  import authorize_user, sort_user
-from my_settings  import SECRET_KEY,ALGORITHM
+from .models         import User
+from postings.models import Posting,Like
+from .utils          import sort_user,authorize_user
+from my_settings     import SECRET_KEY,ALGORITHM
 
 class SingInView(View):
     def post(self,request):
@@ -100,15 +101,10 @@ class SignUpView(View):
             return JsonResponse({'message':'JWT DECODE ERROR'}, status=400)
 
 class AccountView(View):
-    @sort_user
+    @authorize_user
     def get(self,request):
-        result = {}
-
-        if hasattr(request,'user'):
-            result = {
-                'email'         : request.user.email,
-                'nickname'      : request.user.nickname,
-                'profile_image' : request.user.profile_image 
-            }
-        
+        result = {
+            'postings' : [posting.image for posting in request.user.posting.all()],
+            'likes'    : request.user.like.count()
+        }
         return JsonResponse(result, status=200)

@@ -11,7 +11,7 @@ from my_settings import SECRET_KEY, ALGORITHM
 def authorize_user(func):
     def wrapper(self,request):
         try:
-            self_token = request.headers['Authorization']    
+            self_token = request.headers['Authorization']
             payload    = jwt.decode(self_token, SECRET_KEY, ALGORITHM)
 
             if not User.objects.filter(id=payload['id']).exists():

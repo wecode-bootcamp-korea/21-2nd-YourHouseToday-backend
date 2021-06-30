@@ -1,15 +1,16 @@
-from django.http.response import JsonResponse
-from django.test.client import RequestFactory
-from users.utils import authorize_user,sort_user
 import jwt
 import json
+import datetime
+from unittest.mock        import patch, MagicMock
 
-from unittest.mock  import patch, MagicMock
+from django.http.response import JsonResponse
+from django.test          import TestCase, Client
+from django.test.client   import RequestFactory
 
-from django.test import TestCase, Client
-
-from .models import User
-from my_settings  import SECRET_KEY,ALGORITHM
+from .models         import User
+from .utils          import authorize_user,sort_user
+from postings.models import Posting, HousingType, Style, Size, Color, Like
+from my_settings     import SECRET_KEY,ALGORITHM
 
 class SignInTest(TestCase):
     @classmethod
@@ -440,4 +441,59 @@ class SortUserTest(TestCase):
         )
         self.assertEqual(
             response.status_code, 401
+        )
+
+class AccountTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(
+            kakao_id      = "1111111111",
+            profile_image = "http://profile_image.jpg",
+            nickname      = "정연",
+            email         = "anne_with_an_e@kakao.com"
+        )
+
+        color = Color.objects.create(type="test")
+        housing = HousingType.objects.create(type="test")
+        size = Size.objects.create(type="test")
+        style = Style.objects.create(type="test")
+
+        p1 = Posting.objects.create(
+            user=user, image="1.jpg",
+            text="text",
+            back_color=color,housing_type=housing,item_color=color,size=size,style=style,
+            update_at=datetime.datetime.now()
+        )
+        p2 = Posting.objects.create(
+            user=user, image="2.jpg",
+            text="text",
+            back_color=color,housing_type=housing,item_color=color,size=size,style=style,
+            update_at=datetime.datetime.now()
+        )
+        p3 = Posting.objects.create(
+            user=user, image="3.jpg",
+            text="text",
+            back_color=color,housing_type=housing,item_color=color,size=size,style=style,
+            update_at=datetime.datetime.now()
+        )
+
+        Like.objects.create(posting=p1, user=user)
+        Like.objects.create(posting=p2, user=user)
+        Like.objects.create(posting=p3, user=user)
+
+
+    def test_mypage_success(self):
+        user     = User.objects.get(kakao_id="1111111111")
+        token    = jwt.encode({'id': user.id}, SECRET_KEY, ALGORITHM)
+        response = Client().get('/users/mypage', HTTP_AUTHORIZATION=token)
+
+        self.assertEqual(
+            response.json(),
+            {
+                "postings" : ['1.jpg','2.jpg','3.jpg'],
+                "likes"    : 3
+            }
+        )
+        self.assertEqual(
+            response.status_code, 200
         )
