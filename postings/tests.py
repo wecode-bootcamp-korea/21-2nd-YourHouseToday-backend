@@ -165,6 +165,7 @@ class PictureListTest(TestCase):
 
             ]
         })
+        
     def test_picture_list_filter_success(self):
         client   = Client()
         response = client.get('/postings?style=2')
@@ -202,6 +203,7 @@ class PictureListTest(TestCase):
                 }
             ]
         })
+        
     def test_picture_list_order_by_success(self):
         client   = Client()
         response = client.get('/postings?sort=-view')
@@ -267,6 +269,7 @@ class PictureListTest(TestCase):
                 }
             ]
         })
+        
     def test_picture_list_page_get(self):
         client   = Client()
         response = client.get('/postings?limit=2&offset=1')
@@ -303,4 +306,74 @@ class PictureListTest(TestCase):
                     'commentContent': ['너무 보기 좋아요']
                 }
             ]
+        })
+
+class PostingTestCase(TestCase): 
+    def setUp(self):
+        posting_user = User.objects.create(
+            id            = 1,
+            email         = 'asdf@naver.com',
+            nickname      = '하이',
+            kakao_id      = 1,
+            introduction  = '안녕하세요',
+            profile_image = 'profile_image_url'
+            )
+        size_30 = Size.objects.create(id=1, type='30')
+        style_modern = Style.objects.create(id=1, type='modern')
+        housing_type_one_room = HousingType.objects.create(id=1, type='one_room')
+        color = Color.objects.create(id=1,type='red')
+        posting_1 = Posting.objects.create(
+            id        = 1,
+            item_color = color,
+            back_color = color,
+            user      = posting_user,
+            size      = size_30,
+            style     = style_modern,
+            housing_type   = housing_type_one_room,
+            image     = 'posting_image_url',
+            text      = '굿굿',
+            update_at = '2021-06-28',
+            view      = 150
+        )
+        posting_comment_user = User.objects.create(
+            id            = 2,
+            email         = 'a12f@naver.com',
+            nickname      = '하이!!',
+            kakao_id      = 2,
+            introduction  = '안녕하세요!!',
+            profile_image = 'profile_image_url'
+            )
+        posting_like = Like.objects.create(
+            id      = 1,
+            user    = posting_comment_user,
+            posting = posting_1
+        )
+        Comment.objects.create(id=1, posting=posting_1, user=posting_comment_user, text='너무 이쁘다')
+        
+    def tearDown(self):
+        Posting.objects.all().delete()
+        Comment.objects.all().delete()
+        Like.objects.all().delete()
+    def test_postingview_get_success(self):  
+        client   = Client()  
+        response = client.get('/postings/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(),{
+            'posting' :
+                {
+                'id'          : 1,
+                'image'       : "posting_image_url",
+                'text'        : "굿굿",
+                'size'        : '30',
+                'style'       : 'modern',
+                'like'        : 1,
+                'housing_type': 'one_room', 
+                'view'        : 151,
+                'related_user' : [{  
+                    'id'           : 1,
+                    'nickname'     : '하이',
+                    'image_url'    : 'profile_image_url',
+                    'introduction' : '안녕하세요'
+                    }]
+                }
         })
