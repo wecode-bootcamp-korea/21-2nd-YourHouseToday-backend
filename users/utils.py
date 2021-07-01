@@ -62,7 +62,7 @@ def send_mail_all(self,receiver_email,email_message):
         pass
 
 class Mail:
-    def create(self, receiver, subject, template):
+    def __init__(self, receiver, subject, template):
         try:
             self.receiver = receiver
             self.message  = EmailMessage()
@@ -72,7 +72,7 @@ class Mail:
             self.message["To"]      = receiver
 
             content          = get_template(template)
-            content_rendered = content.render(context={'receiver':receiver})
+            content_rendered = content.render(context={'receiver':self.receiver})
             self.message.set_content((content_rendered),'html')
             
         except:
@@ -86,5 +86,6 @@ class Mail:
                 server.login(EMAIL_HOST,EMAIL_PASSWORD)
                 server.sendmail(EMAIL_HOST,self.receiver, self.message.as_string())
                 server.quit()
+                
         except:
             pass
