@@ -319,7 +319,6 @@ class PostingsViewTest(TestCase):
         mock_s3client.upload_fileobj = MagicMock()
         access_token                 = jwt.encode({'id': 1}, SECRET_KEY, ALGORITHM)
         headers                      = {'HTTP_Authorization': access_token}
-        print(access_token)
         form_data = {
             'image': mock_img,
             'info' : json.dumps({
