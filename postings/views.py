@@ -107,8 +107,8 @@ class LikeView(View):
     def delete(self, request, posting_id):
         user = request.user
         
-        Like.objects.delete(
+        Like.objects.get(
             user_id    = user.id,
             posting_id = posting_id
-        )
+            ).delete()
         return JsonResponse({'message': 'DELETE_LIKE'}, status=204)

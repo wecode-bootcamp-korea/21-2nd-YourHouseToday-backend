@@ -9,7 +9,7 @@ from .models     import User
 from my_settings import SECRET_KEY, ALGORITHM
 
 def authorize_user(func):
-    def wrapper(self,request):
+    def wrapper(self,request, **kwarg):
         try:
             self_token = request.headers['Authorization']    
             payload    = jwt.decode(self_token, SECRET_KEY, ALGORITHM)
@@ -25,7 +25,7 @@ def authorize_user(func):
         except jwt.DecodeError:
             return JsonResponse({'message' : 'JWT DECODE ERROR'},status=401)
 
-        return func(self,request)
+        return func(self,request,**kwarg)
 
     return wrapper
 
