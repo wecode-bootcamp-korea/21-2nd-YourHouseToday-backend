@@ -104,6 +104,7 @@ class AccountView(View):
     @authorize_user
     def get(self,request):
         result = {
+            'user'     : request.user.nickname,
             'postings' : [posting.image for posting in request.user.posting.all()],
             'likes'    : request.user.like.count()
         }
