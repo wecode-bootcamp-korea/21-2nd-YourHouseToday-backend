@@ -88,8 +88,7 @@ class SignUpView(View):
                 'self_token'    : self_token    
             }
 
-            signup_mail = Mail()
-            signup_mail.create(
+            signup_mail = Mail(
                 receiver=data['email'],
                 subject="Your House Today에 가입해주셔서 감사합니다!",
                 template='mail_signup.html'
