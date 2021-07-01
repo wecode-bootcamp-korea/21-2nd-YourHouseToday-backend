@@ -34,31 +34,28 @@ class CommentView(View):
             offset     = limit*(offset-1)
             comments = list(Comment.objects.filter(posting_id=posting_id).order_by('-create_at'))[offset:offset+limit]
             result = [{
-                'text'  : comment.text,
-                'data'  : comment.create_at,
-                'related_user' : {  
-                    'id'           : comment.user.id,
-                    'nickname'     : comment.user.nickname,
-                    'image_url'    : comment.user.profile_image
-                }
-            }for comment in comments]
+                'text'          : comment.text,
+                'create_at'     : str(comment.create_at)[:10],
+                'user_id'       : comment.user.id,
+                'user_nickname' : comment.user.nickname,
+                'user_profile'  : comment.user.profile_image
+                }for comment in comments]
             
             return JsonResponse({'comment' : result}, status=200)
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
     
     @authorize_user 
-    def patch(self, request):
+    def patch(self, request, comment_id):
         try:
             data = json.loads(request.body)
-            comment = Comment.objects.get(id=data['comment_id'])
+            comment = Comment.objects.get(id=comment_id)
             comment.text = data['text']
             comment.save()
             
             return JsonResponse({'message': 'COMMENT_PATCH'}, status=200)
         except KeyError:
-            return JsonResponse({'message': 'KEY_ERROR0'}, status=400)
-        
+            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
     
     @authorize_user
     def delete(self, request, comment_id): 
