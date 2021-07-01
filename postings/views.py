@@ -67,7 +67,9 @@ class PictureListView(View):
 class PostingView(View):
     def get(self, request, posting_id):
         try:
-            posting = Posting.objects.get(id=posting_id) 
+            posting = Posting.objects.get(id=posting_id)
+            posting.view += 1
+            posting.save()
             result = {
                 'id'           : posting.id,
                 'image'        : posting.image,
@@ -110,4 +112,3 @@ class LikeView(View):
             posting_id = posting_id
         )
         return JsonResponse({'message': 'DELETE_LIKE'}, status=204)
-
