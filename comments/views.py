@@ -34,6 +34,7 @@ class CommentView(View):
             offset     = limit*(offset-1)
             comments = list(Comment.objects.filter(posting_id=posting_id).order_by('-create_at'))[offset:offset+limit]
             result = [{
+                'id'            : comment.id,
                 'text'          : comment.text,
                 'create_at'     : str(comment.create_at)[:10],
                 'user_id'       : comment.user.id,
